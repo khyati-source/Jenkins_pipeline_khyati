@@ -35,8 +35,8 @@ pipeline {
                 script {
                     // Commit and push using the default credentials (GitHub credentials in Jenkins)
                     sh '''
-                       //git config --global user.name "Jenkins User"
-                        //git config --global user.email "jenkins@yourcompany.com"
+                        git config --global user.name "Jenkins User"
+                        git config --global user.email "jenkins@yourcompany.com"
                         git add ${FILE_PATH}
                         git commit -m "Local change"
                         git push origin ${GIT_BRANCH}
