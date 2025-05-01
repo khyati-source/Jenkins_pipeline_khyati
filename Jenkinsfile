@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_CREDENTIALS = credentials('my_github') // Combines username and token
+        GIT_CREDENTIALS = credentials('my_github') // Jenkins Username+Password credential ID
     }
 
     stages {
@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Modify File') {
+        stage('Modify or Create File') {
             steps {
                 sh '''
                     mkdir -p Jenkinsfile_assignment2
@@ -26,10 +26,11 @@ pipeline {
         stage('Git Commit and Push') {
             steps {
                 sh '''
-                    git config --global user.name "Jenkins User"
-                    git config --global user.email "jenkins@yourcompany.com"
-                    git add Jenkinsfile_assignment2/test.txt || echo "No changes to add"
-                    git commit -m "Auto update on $(date)" || echo "No commit needed"
+                    git config user.name "Jenkins User"
+                    git config user.email "jenkins@yourcompany.com"
+                    git pull origin main || echo "Nothing to pull"
+                    git add Jenkinsfile_assignment2/test.txt || echo "Nothing to add"
+                    git commit -m "Auto update on $(date)" || echo "Nothing to commit"
                     git push https://$GIT_CREDENTIALS@github.com/khyati-source/Jenkins_pipeline_khyati.git
                 '''
             }
