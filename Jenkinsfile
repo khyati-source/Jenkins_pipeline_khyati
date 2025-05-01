@@ -2,22 +2,21 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'https://github.com/khyati-source/Jenkins_pipeline_khyati.git'
-        GIT_BRANCH = 'main'
-        FILE_PATH = 'Jenkinsfile_assignment2/test.txt'
+        // Fetch the GitHub username and token stored in Jenkins credentials
+        GITHUB_USER = credentials('khyati-source')  // The ID of the credential storing your GitHub username
+        GITHUB_TOKEN = credentials('my_github')    // The ID of the credential storing your GitHub token
     }
 
-    stages {
+   stages {
         stage('Checkout Repository') {
             steps {
-                // Checkout the repository using Jenkins' default credentials
-                git url: "${env.GIT_REPO}",
-                    branch: "${env.GIT_BRANCH}",
-                    credentialsId: 'my_github'  // Replace with your Jenkins GitHub credentials ID
+                git url: 'https://github.com/khyati-source/Jenkins_pipeline_khyati.git',
+                    branch: 'main',
+                    credentialsId: 'my_github'  // Use credentials stored in Jenkins for Git operations
             }
         }
 
-        stage('Modify File') {
+         stage('Modify File') {
             steps {
                 script {
                     sh """
@@ -25,21 +24,25 @@ pipeline {
                         rm -f Jenkinsfile_assignment2/test.txt
                         touch Jenkinsfile_assignment2/test.txt
                         echo 'Modified' >> Jenkinsfile_assignment2/test.txt
+                        cat Jenkinsfile_assignment2/test.txt  # Verify the file content
                     """
                 }
             }
         }
 
-        stage('Git Commit and Push') {
+       stage('Git Commit and Push') {
             steps {
                 script {
-                    // Commit and push using the default credentials (GitHub credentials in Jenkins)
                     sh '''
                         git config --global user.name "Jenkins User"
                         git config --global user.email "jenkins@yourcompany.com"
-                        git add ${FILE_PATH}
+                        git add Jenkinsfile_assignment2/test.txt
                         git commit -m "Local change"
-                        git push origin ${GIT_BRANCH}
+                        git status  # Verify file is staged for commit
+                        git log -n 1  # Check the latest commit to confirm commit was successful
+                        
+                        # Push using credentials passed in environment variables
+                        git push https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/khyati-source/Jenkins_pipeline_khyati.git
                     '''
                 }
             }
